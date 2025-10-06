@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Link Kolaboratif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .sections-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .link-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .link-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .link-item a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .link-item a:hover {
+            color: #667eea;
+        }
+
+        .link-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .add-link-form {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+        }
+
+        .add-link-form h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .links-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Website Link Kolaboratif</h1>
+            <p>Kumpulan link-link berguna untuk semua orang</p>
+        </div>
+
+        <div class="sections-container">
+            <div class="section">
+                <h2>🔍 Pencarian Jurnal & Artikel</h2>
+                <div class="links-list" id="jurnal-links"></div>
+            </div>
+
+            <div class="section">
+                <h2>🤖 AI yang Berguna</h2>
+                <div class="links-list" id="ai-links"></div>
+            </div>
+
+            <div class="section">
+                <h2>👥 Link dari Pengguna Lain</h2>
+                <div class="links-list" id="user-links"></div>
+            </div>
+        </div>
+
+        <div class="add-link-form">
+            <h3>➕ Tambah Link Baru</h3>
+            <form id="addLinkForm">
+                <div class="form-group">
+                    <label for="linkTitle">Judul Link:</label>
+                    <input type="text" id="linkTitle" required placeholder="Contoh: Google Scholar">
+                </div>
+                <div class="form-group">
+                    <label for="linkUrl">URL:</label>
+                    <input type="url" id="linkUrl" required placeholder="Contoh: https://scholar.google.com">
+                </div>
+                <div class="form-group">
+                    <label for="linkDescription">Deskripsi:</label>
+                    <textarea id="linkDescription" rows="3" placeholder="Deskripsi singkat tentang link ini"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="linkCategory">Kategori:</label>
+                    <select id="linkCategory" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="jurnal">Pencarian Jurnal</option>
+                        <option value="ai">AI Tools</option>
+                        <option value="user">Lainnya</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Tambah Link</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">Link berhasil ditambahkan!</div>
+
+    <script>
+        // Inisialisasi data default jika belum ada
+        function initializeData() {
+            const defaultLinks = {
+                jurnal: [
+                    {
+                        id: Date.now() + 1,
+                        title: "Google Scholar",
+                        url: "https://scholar.google.com",
+                        description: "Pencarian artikel akademik dan jurnal ilmiah"
+                    },
+                    {
+                        id: Date.now() + 2,
+                        title: "PubMed",
+                        url: "https://pubmed.ncbi.nlm.nih.gov",
+                        description: "Database jurnal medis dan ilmu kehidupan"
+                    },
+                    {
+                        id: Date.now() + 3,
+                        title: "IEEE Xplore",
+                        url: "https://ieeexplore.ieee.org",
+                        description: "Jurnal dan konferensi teknik dan komputer"
+                    }
+                ],
+                ai: [
+                    {
+                        id: Date.now() + 4,
+                        title: "DeepSeek",
+                        url: "https://chat.deepseek.com",
+                        description: "AI assistant yang powerful dan gratis"
+                    },
+                    {
+                        id: Date.now() + 5,
+                        title: "ChatGPT",
+                        url: "https://chat.openai.com",
+                        description: "OpenAI ChatGPT - AI conversation"
+                    },
+                    {
+                        id: Date.now() + 6,
+                        title: "Claude",
+                        url: "https://claude.ai",
+                        description: "Anthropic's AI assistant"
+                    }
+                ],
+                user: []
+            };
+
+            // Cek apakah data sudah ada di localStorage
+            if (!localStorage.getItem('collaborativeLinks')) {
+                localStorage.setItem('collaborativeLinks', JSON.stringify(defaultLinks));
+            }
+        }
+
+        // Fungsi untuk mendapatkan data dari localStorage
+        function getLinks() {
+            const saved = localStorage.getItem('collaborativeLinks');
+            return saved ? JSON.parse(saved) : { jurnal: [], ai: [], user: [] };
+        }
+
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveLinks(links) {
+            localStorage.setItem('collaborativeLinks', JSON.stringify(links));
+        }
+
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Fungsi untuk menampilkan link
+        function displayLinks() {
+            const links = getLinks();
+            
+            displayCategoryLinks(links.jurnal, 'jurnal-links');
+            displayCategoryLinks(links.ai, 'ai-links');
+            displayCategoryLinks(links.user, 'user-links');
+        }
+
+        function displayCategoryLinks(linkArray, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (linkArray.length === 0) {
+                container.innerHTML = '<div class="link-item">Belum ada link</div>';
+                return;
+            }
+
+            linkArray.forEach(link => {
+                const linkElement = document.createElement('div');
+                linkElement.className = 'link-item';
+                linkElement.innerHTML = `
+                    <a href="${link.url}" target="_blank" rel="noopener">${link.title}</a>
+                    <div class="link-description">${link.description}</div>
+                    <button class="btn btn-delete" onclick="deleteLink(${link.id})">Hapus</button>
+                `;
+                container.appendChild(linkElement);
+            });
+        }
+
+        // Fungsi untuk menghapus link
+        function deleteLink(linkId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus link ini?')) {
+                return;
+            }
+
+            const links = getLinks();
+            
+            // Cari dan hapus link dari semua kategori
+            Object.keys(links).forEach(category => {
+                links[category] = links[category].filter(link => link.id !== linkId);
+            });
+
+            saveLinks(links);
+            displayLinks();
+            showNotification('Link berhasil dihapus!');
+        }
+
+        // Fungsi untuk menambah link baru
+        document.getElementById('addLinkForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('linkTitle').value;
+            const url = document.getElementById('linkUrl').value;
+            const description = document.getElementById('linkDescription').value;
+            const category = document.getElementById('linkCategory').value;
+
+            // Validasi URL
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                alert('URL harus dimulai dengan http:// atau https://');
+                return;
+            }
+
+            const newLink = {
+                id: Date.now(), // ID unik berdasarkan timestamp
+                title: title,
+                url: url,
+                description: description
+            };
+
+            const links = getLinks();
+            
+            // Tambahkan ke kategori yang sesuai
+            if (links[category]) {
+                links[category].push(newLink);
+            } else {
+                links.user.push(newLink);
+            }
+
+            saveLinks(links);
+            displayLinks();
+
+            // Reset form
+            this.reset();
+
+            showNotification('Link berhasil ditambahkan!');
+            
+            // Scroll ke section yang sesuai
+            document.getElementById(category + '-links').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        });
+
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            displayLinks();
+        });
+    </script>
+</body>
+</html>
